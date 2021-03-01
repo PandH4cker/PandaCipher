@@ -73,7 +73,8 @@ int invPerm[128] = {
 
 void Block_xor(Block *block, Block *value)
 {
-    // TODO
+    for (int i = 0; i < sizeof(block->bundles); ++i)
+        block->bundles[i] ^= value->bundles[i];
 }
 
 void Block_substitution(Block *block)
