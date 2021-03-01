@@ -51,7 +51,7 @@ void freeDiffTable(DiffTable *diffTable)
     }
 
     // Clear the memory (security)
-    memset(diffTable, 0, sizeof(diffTable));
+    memset(diffTable, 0, sizeof(*diffTable));
 }
 
 void randomSBox(int *sBox, int nbBits)
