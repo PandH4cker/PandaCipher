@@ -73,28 +73,54 @@ int invPerm[128] = {
 
 void Block_xor(Block *block, Block *value)
 {
-    for (int i = 0; i < sizeof(block->bundles); ++i)
+    for (int i = 0; i < sizeof(block->bundles)/sizeof(block->bundles[0]); ++i)
         block->bundles[i] ^= value->bundles[i];
 }
 
 void Block_substitution(Block *block)
 {
-    // TODO
+    for (int i = 0; i < sizeof(block->bundles)/sizeof(block->bundles[0]); ++i)
+        block->bundles[i] = sBox[block->bundles[i]];
 }
 
 void Block_invSubstitution(Block *block)
 {
-    // TODO
+    for (int i = 0; i < sizeof(block->bundles)/sizeof(block->bundles[0]); ++i)
+        block->bundles[i] = invSBox[block->bundles[i]];
 }
 
 void Block_permutation(Block *block)
 {
-    // TODO
+    Block blk = *block;
+    int count = 0;
+    for (int i = sizeof(block->bundles)/sizeof(block->bundles[0]) - 1; i > -1; --i)
+        for (int j = 0; j < 8; ++j)
+        { 
+            int blockIndex = 15 - ((int)(perm[count] / 8));
+            int bitIndex = perm[count++] - (8 * (15 - blockIndex));
+            int valuetopermut = (blk.bundles[i] >> j) & 1;
+            if (valuetopermut)
+                block->bundles[blockIndex] |= 1 << bitIndex;
+            else
+                block->bundles[blockIndex] &= ~(1 << bitIndex);
+        }
 }
 
 void Block_invPermutation(Block *block)
 {
-    // TODO
+    Block blk = *block;
+    int count = 0;
+    for (int i = sizeof(block->bundles)/sizeof(block->bundles[0]) - 1; i > -1; --i)
+        for (int j = 0; j < 8; ++j)
+        { 
+            int blockIndex = 15 - ((int)(invPerm[count] / 8));
+            int bitIndex = invPerm[count++] - (8 * (15 - blockIndex));
+            int valuetopermut = (blk.bundles[i] >> j) & 1;
+            if (valuetopermut)
+                block->bundles[blockIndex] |= 1 << bitIndex;
+            else
+                block->bundles[blockIndex] &= ~(1 << bitIndex);
+        }
 }
 
 void initCipher(CipherData *data, Block *cipherKey)
