@@ -219,7 +219,7 @@ void decryptCBC(CipherData *data, Block *iv, Block *message, int nbBlocks)
     for (int i = nbBlocks - 1; i >= 1; --i)
     {
         decryptBlock(data, &message[i]);
-        Block_xor(&message[i - 1], &message[i]);
+        Block_xor(&message[i], &message[i - 1]);
     }
     decryptBlock(data, &message[0]);
     Block_xor(&message[0], iv);
