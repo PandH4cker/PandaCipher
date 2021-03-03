@@ -125,27 +125,104 @@ void Block_invPermutation(Block *block)
 
 void initCipher(CipherData *data, Block *cipherKey)
 {
-    // TODO
+    data->roundKeys[0] = *cipherKey;
+    for (int i = 1; i < NB_ROUNDS + 1; ++i)
+    {
+        Block b =
+        {
+            .bundles = { 0 }
+        };
+
+        //k3[r - 1]
+        b.bundles[3] = data->roundKeys[i - 1].bundles[3];
+        Block_substitution(&b);
+        data->roundKeys[i].bundles[0] = b.bundles[3];
+
+        b.bundles[3] = 0;
+
+        //k4[r - 1]
+        b.bundles[4] = data->roundKeys[i - 1].bundles[4];
+        Block_substitution(&b);
+        data->roundKeys[i].bundles[1] = b.bundles[4];
+
+        b.bundles[4] = 0;
+
+        //k5[r - 1]
+        b.bundles[5] = data->roundKeys[i - 1].bundles[5];
+        Block_substitution(&b);
+        data->roundKeys[i].bundles[2] = b.bundles[5];
+
+        b.bundles[5] = 0;
+        
+        //k6[r - 1]
+        b.bundles[6] = data->roundKeys[i - 1].bundles[6] ^ i;
+        data->roundKeys[i].bundles[3] = b.bundles[6];
+
+        b.bundles[6] = 0;
+
+        data->roundKeys[i].bundles[4] = data->roundKeys[i - 1].bundles[7];
+        data->roundKeys[i].bundles[5] = data->roundKeys[i - 1].bundles[8];
+        data->roundKeys[i].bundles[6] = data->roundKeys[i - 1].bundles[9];
+        data->roundKeys[i].bundles[7] = data->roundKeys[i - 1].bundles[10];
+        data->roundKeys[i].bundles[8] = data->roundKeys[i].bundles[0] ^ data->roundKeys[i - 1].bundles[11];
+        data->roundKeys[i].bundles[9] = data->roundKeys[i].bundles[1] ^ data->roundKeys[i - 1].bundles[12];
+        data->roundKeys[i].bundles[10] = data->roundKeys[i].bundles[2] ^ data->roundKeys[i - 1].bundles[13];
+        data->roundKeys[i].bundles[11] = data->roundKeys[i].bundles[3] ^ data->roundKeys[i - 1].bundles[14];
+        data->roundKeys[i].bundles[12] = data->roundKeys[i].bundles[4] ^ data->roundKeys[i - 1].bundles[15];
+        data->roundKeys[i].bundles[13] = data->roundKeys[i].bundles[5] ^ data->roundKeys[i - 1].bundles[0];
+        data->roundKeys[i].bundles[14] = data->roundKeys[i].bundles[6] ^ data->roundKeys[i - 1].bundles[1];
+        data->roundKeys[i].bundles[15] = data->roundKeys[i].bundles[7] ^ data->roundKeys[i - 1].bundles[2];
+    }
 }
 
 void encryptBlock(CipherData *data, Block *block)
 {
-    // TODO
+    for (int i = 0; i < NB_ROUNDS - 1; ++i)
+    {
+        Block_xor(block, &data->roundKeys[i]);
+        Block_substitution(block);
+        Block_permutation(block);
+    }
+
+    Block_xor(block, &data->roundKeys[NB_ROUNDS - 1]);
+    Block_substitution(block);
+    Block_xor(block, &data->roundKeys[NB_ROUNDS]);
 }
 
 void decryptBlock(CipherData *data, Block *block)
 {
-    // TODO
+    Block_xor(block, &data->roundKeys[NB_ROUNDS]);
+    Block_invSubstitution(block);
+    Block_xor(block, &data->roundKeys[NB_ROUNDS - 1]);
+
+    for (int i = NB_ROUNDS - 2; i >= 0; --i)
+    {
+        Block_invPermutation(block);
+        Block_invSubstitution(block);
+        Block_xor(block, &data->roundKeys[i]);
+    }
 }
 
 void encryptCBC(CipherData *data, Block *iv, Block *message, int nbBlocks)
 {
-    // TODO
+    Block_xor(&message[0], iv);
+    encryptBlock(data, &message[0]);
+    for (int i = 1; i < nbBlocks; ++i)
+    {
+        Block_xor(&message[i], &message[i - 1]);
+        encryptBlock(data, &message[i]);
+    }
 }
 
 void decryptCBC(CipherData *data, Block *iv, Block *message, int nbBlocks)
 {
-    // TODO
+    for (int i = nbBlocks - 1; i >= 1; --i)
+    {
+        decryptBlock(data, &message[i]);
+        Block_xor(&message[i - 1], &message[i]);
+    }
+    decryptBlock(data, &message[0]);
+    Block_xor(&message[0], iv);
 }
 
 void printBlock(Block *block)

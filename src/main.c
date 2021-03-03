@@ -41,7 +41,13 @@ int main(int argc, char ** argv)
     printf("Key    ");
     printBlock(&cipherKey);
 
-    printf("\n[+] XORing with the cipherkey..\n");
+    CipherData cipherData = { 0 };
+    initCipher(&cipherData, &cipherKey);
+    encryptBlock(&cipherData, &plaintext);
+    printBlock(&plaintext);
+    decryptBlock(&cipherData, &plaintext);
+    printBlock(&plaintext);
+    /*printf("\n[+] XORing with the cipherkey..\n");
     Block_xor(&plaintext, &cipherKey);
 
     printf("Xored    ");
@@ -61,7 +67,7 @@ int main(int argc, char ** argv)
     printf("Expected ");
     printBlock(&expected);
 
-    Block_permutation(&plaintext);
+    Block_permutation(&plaintext);*/
     /*CipherData cipherData = { 0 };
     Block cipherKey = { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF };
     Block block = { 0 };
