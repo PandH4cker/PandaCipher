@@ -80,7 +80,8 @@ void initDiffTable(DiffTable *diffTable, int *sBox)
         for (int j = 0; j < d.nbElts; ++j)
         {
             int diff = sBox[j] ^ sBox[j ^ i];
-            ++d.coeffs[i][diff];
+            if (++d.coeffs[i][diff] > d.max && ((i + diff) != 0))
+                d.max = d.coeffs[i][diff];
         }
     *diffTable = d;
 }

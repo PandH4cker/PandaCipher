@@ -27,7 +27,7 @@ int main(int argc, char ** argv)
             printf("%2d", diffTable->coeffs[i][j]);
         printf("\n");
     }
-
+    printf("Max in DiffTable: %d\n", diffTable->max);
 
     free(sBox);
     freeDiffTable(diffTable);
