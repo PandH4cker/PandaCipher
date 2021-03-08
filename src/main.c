@@ -12,22 +12,42 @@
 
 int main(int argc, char ** argv)
 {
+    //1615231972
+    printf("%ld\n", time(NULL));
     srand(time(NULL));
-    int nbBits = 4;
+    int nbBits = 8;
     DiffTable * diffTable = newDiffTable(nbBits);
+    int size = diffTable->nbElts;
 
-    int * sBox = malloc(diffTable->nbElts * sizeof(int));
+    int * sBox = malloc(size * sizeof(int));
     randomSBox(sBox, diffTable->nbBits);
 
+    int * bestSBox = malloc(size * sizeof(int));
+        
     initDiffTable(diffTable, sBox);
+    int max = diffTable->max;
+    int nbMax = -1;
 
-    for (int i = 0; i < diffTable->nbElts; ++i)
+    for (int i = 0; i < 1 << 10; ++i)
     {
-        for(int j = 0; j < diffTable->nbElts; ++j)
-            printf("%2d", diffTable->coeffs[i][j]);
-        printf("\n");
+        memcpy(bestSBox, sBox, size * sizeof(int));
+        littleShuffle(bestSBox, size, 0.42);
+
+        initDiffTable(diffTable, bestSBox);
+        int n = numberOfMax(bestSBox, size, diffTable->max);
+        if (max > diffTable->max || 
+           (max == diffTable->max && (nbMax == -1 || nbMax > n)))
+        {
+            max = diffTable->max;
+            nbMax = n;
+            memcpy(sBox, bestSBox, size * sizeof(int));
+        }
     }
+    free(bestSBox);
+
+    initDiffTable(diffTable, sBox);
     printf("Max in DiffTable: %d\n", diffTable->max);
+    printf("Number of max: %d\n", nbMax);
 
     free(sBox);
     freeDiffTable(diffTable);

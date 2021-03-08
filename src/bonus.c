@@ -62,10 +62,8 @@ void swap(int * a, int * b)
     *b = temp;
 }
 
-void randomSBox(int * sBox, int nbBits)
+void shuffle(int * sBox, unsigned int size)
 {
-    unsigned int size = 1 << nbBits;
-    for (int i = 0; i < size; ++i) sBox[i] = i;
     for (int i = size - 1; i > 0; --i)
     {
         int j = rand() % (i + 1);
@@ -73,9 +71,36 @@ void randomSBox(int * sBox, int nbBits)
     }
 }
 
+void littleShuffle(int * sBox, unsigned int size, float percent)
+{
+    unsigned int newSize = size * percent;
+    for (int i = newSize; i > 0; --i)
+    {
+        int j = rand() % (i + 1);
+        swap(&sBox[i], &sBox[j]);
+    }
+}
+
+int numberOfMax(int * sBox, unsigned int size, unsigned int max)
+{
+    int count = 0;
+    for (int i = 0; i < size; ++i) if (sBox[i] == max) ++count;
+    return count;
+}
+
+void randomSBox(int * sBox, int nbBits)
+{
+    unsigned int size = 1 << nbBits;
+    for (int i = 0; i < size; ++i) sBox[i] = i;
+    shuffle(sBox, size);
+}
+
 void initDiffTable(DiffTable *diffTable, int *sBox)
 {
     DiffTable d = *diffTable;
+    d.max = 0;
+    for (int i = 0; i < d.nbElts; ++i)
+        memset(d.coeffs[i], 0, sizeof(int) * d.nbElts);
     for (int i = 0; i < d.nbElts; ++i)
         for (int j = 0; j < d.nbElts; ++j)
         {

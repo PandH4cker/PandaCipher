@@ -82,6 +82,10 @@ void initFastCipher(FastCipherData *data, Block *cipherKey);
 void fastEncryptBlock(FastCipherData *data, Block *block);
 
 void swap(int * a, int * b);
+void shuffle(int * sBox, unsigned int size);
+void littleShuffle(int * sBox, unsigned int size, float percent);
+int numberOfMax(int * sBox, unsigned int size, unsigned int max);
+
 
 #endif // !_BONUS_H_
 
