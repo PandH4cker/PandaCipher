@@ -75,7 +75,14 @@ void randomSBox(int * sBox, int nbBits)
 
 void initDiffTable(DiffTable *diffTable, int *sBox)
 {
-    // TODO
+    DiffTable d = *diffTable;
+    for (int i = 0; i < d.nbElts; ++i)
+        for (int j = 0; j < d.nbElts; ++j)
+        {
+            int diff = sBox[j] ^ sBox[j ^ i];
+            ++d.coeffs[i][diff];
+        }
+    *diffTable = d;
 }
 
 void initFastCipher(FastCipherData *data, Block *cipherKey)

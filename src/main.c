@@ -12,18 +12,27 @@
 
 int main(int argc, char ** argv)
 {
-    /*srand(time(NULL));
-    int size = 1 << 10;
-    int * sBox = malloc(size * sizeof(int));
-    randomSBox(sBox, 10);
-    printf("[");
-    for (long long i = 0; i < size; ++i)
-        printf("%02X\n", sBox[i]);
-    puts("]");
-    free(sBox);*/
+    srand(time(NULL));
+    int nbBits = 4;
+    DiffTable * diffTable = newDiffTable(nbBits);
 
+    int * sBox = malloc(diffTable->nbElts * sizeof(int));
+    randomSBox(sBox, diffTable->nbBits);
+
+    initDiffTable(diffTable, sBox);
+
+    for (int i = 0; i < diffTable->nbElts; ++i)
+    {
+        for(int j = 0; j < diffTable->nbElts; ++j)
+            printf("%2d", diffTable->coeffs[i][j]);
+        printf("\n");
+    }
+
+
+    free(sBox);
+    freeDiffTable(diffTable);
     // panda cipher :D!
-    Block plaintext = 
+    /*Block plaintext = 
     { 
         .bundles = 
         {
@@ -59,6 +68,6 @@ int main(int argc, char ** argv)
     printBlock(&plaintext);
     decryptBlock(&cipherData, &plaintext);
     printf("Decrypted\t");
-    printBlock(&plaintext);
+    printBlock(&plaintext);*/
     return EXIT_SUCCESS;
 }
