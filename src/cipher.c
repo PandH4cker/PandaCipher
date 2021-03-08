@@ -75,7 +75,7 @@ void Block_xor(Block *block, Block *value)
 {
     Block b = *block; 
     Block v = *value;
-    for (int i = 0; i < BLOCK_SIZE; ++i)
+    for (byte i = 0; i < BLOCK_SIZE; ++i)
         b.bundles[i] ^= v.bundles[i];
     *block = b;
 }
@@ -83,7 +83,7 @@ void Block_xor(Block *block, Block *value)
 void Block_substitution(Block *block)
 {
     Block b = *block;
-    for (int i = 0; i < BLOCK_SIZE; ++i)
+    for (byte i = 0; i < BLOCK_SIZE; ++i)
         b.bundles[i] = sBox[b.bundles[i]];
     *block = b;
 }
@@ -91,7 +91,7 @@ void Block_substitution(Block *block)
 void Block_invSubstitution(Block *block)
 {
     Block b = *block;
-    for (int i = 0; i < BLOCK_SIZE; ++i)
+    for (byte i = 0; i < BLOCK_SIZE; ++i)
         b.bundles[i] = invSBox[b.bundles[i]];
     *block = b;
 }
@@ -101,8 +101,8 @@ void Block_permutation(Block *block)
     Block blk = *block;
     Block b = blk;
     byte count = 0;
-    for (int i = BLOCK_SIZE - 1; i > -1; --i)
-        for (int j = 0; j < 8; ++j)
+    for (int i = BLOCK_SIZE - 1; i >= 0; --i)
+        for (byte j = 0; j < 8; ++j)
         { 
             byte blockIndex = 15 - perm[count] / 8;
             byte bitIndex = perm[count++] - (8 * (15 - blockIndex));
@@ -118,12 +118,12 @@ void Block_invPermutation(Block *block)
     Block blk = *block;
     Block b = blk;
     byte count = 0;
-    for (int i = BLOCK_SIZE - 1; i > -1; --i)
-        for (int j = 0; j < 8; ++j)
+    for (int i = BLOCK_SIZE - 1; i >= 0; --i)
+        for (byte j = 0; j < 8; ++j)
         { 
-            int blockIndex = 15 - invPerm[count] / 8;
-            int bitIndex = invPerm[count++] - (8 * (15 - blockIndex));
-            int valuetopermut = (blk.bundles[i] >> j) & 1;
+            byte blockIndex = 15 - invPerm[count] / 8;
+            byte bitIndex = invPerm[count++] - (8 * (15 - blockIndex));
+            byte valuetopermut = (blk.bundles[i] >> j) & 1;
             b.bundles[blockIndex] = (b.bundles[blockIndex] & ~(1UL << bitIndex)) | 
                                     (valuetopermut << bitIndex);
         }
@@ -134,7 +134,7 @@ void initCipher(CipherData *data, Block *cipherKey)
 {
     CipherData d = *data;
     d.roundKeys[0] = *cipherKey;
-    for (int i = 1; i < NB_ROUNDS + 1; ++i)
+    for (byte i = 1; i < NB_ROUNDS + 1; ++i)
     {
         d.roundKeys[i].bundles[0] = sBox[d.roundKeys[i - 1].bundles[3]];
         d.roundKeys[i].bundles[1] = sBox[d.roundKeys[i - 1].bundles[4]];
@@ -158,7 +158,7 @@ void initCipher(CipherData *data, Block *cipherKey)
 
 void encryptBlock(CipherData *data, Block *block)
 {
-    for (int i = 0; i < NB_ROUNDS - 1; ++i)
+    for (byte i = 0; i < NB_ROUNDS - 1; ++i)
     {
         Block_xor(block, &data->roundKeys[i]);
         Block_substitution(block);
@@ -188,7 +188,7 @@ void encryptCBC(CipherData *data, Block *iv, Block *message, int nbBlocks)
 {
     Block_xor(&message[0], iv);
     encryptBlock(data, &message[0]);
-    for (int i = 1; i < nbBlocks; ++i)
+    for (byte i = 1; i < nbBlocks; ++i)
     {
         Block_xor(&message[i], &message[i - 1]);
         encryptBlock(data, &message[i]);
