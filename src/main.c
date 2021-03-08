@@ -5,12 +5,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 //-------------------------------------------------------------------------------------------------
 //  Chiffrement et déchiffrement
 
 int main(int argc, char ** argv)
 {
+    /*srand(time(NULL));
+    int size = 1 << 10;
+    int * sBox = malloc(size * sizeof(int));
+    randomSBox(sBox, 10);
+    printf("[");
+    for (long long i = 0; i < size; ++i)
+        printf("%02X\n", sBox[i]);
+    puts("]");
+    free(sBox);*/
+
     // panda cipher :D!
     Block plaintext = 
     { 
@@ -23,7 +34,7 @@ int main(int argc, char ** argv)
         }
     };
 
-    printf("Plain  ");
+    printf("Plain\t\t");
     printBlock(&plaintext);
 
     // 0x0123456789ABCDEF
@@ -38,14 +49,16 @@ int main(int argc, char ** argv)
         }
     };
 
-    printf("Key    ");
+    printf("Key\t\t");
     printBlock(&cipherKey);
 
     CipherData cipherData = { 0 };
     initCipher(&cipherData, &cipherKey);
     encryptBlock(&cipherData, &plaintext);
+    printf("Crypted\t\t");
     printBlock(&plaintext);
     decryptBlock(&cipherData, &plaintext);
+    printf("Decrypted\t");
     printBlock(&plaintext);
     return EXIT_SUCCESS;
 }

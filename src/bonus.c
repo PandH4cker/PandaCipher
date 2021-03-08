@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 DiffTable *newDiffTable(int nbBits)
 {
@@ -54,9 +55,22 @@ void freeDiffTable(DiffTable *diffTable)
     memset(diffTable, 0, sizeof(*diffTable));
 }
 
-void randomSBox(int *sBox, int nbBits)
+void swap(int * a, int * b)
 {
-    // TODO
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void randomSBox(int * sBox, int nbBits)
+{
+    unsigned int size = 1 << nbBits;
+    for (int i = 0; i < size; ++i) sBox[i] = i;
+    for (int i = size - 1; i > 0; --i)
+    {
+        int j = rand() % (i + 1);
+        swap(&sBox[i], &sBox[j]);
+    }
 }
 
 void initDiffTable(DiffTable *diffTable, int *sBox)

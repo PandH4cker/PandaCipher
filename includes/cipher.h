@@ -9,6 +9,8 @@
 // Nombre de rondes de la fonction de chiffrement.
 #define NB_ROUNDS 16
 
+#define BLOCK_SIZE 16
+
 //-------------------------------------------------------------------------------------------------
 //  Structures
 
@@ -32,7 +34,7 @@ extern int invPerm[128];
 typedef struct Block_s
 {
     /// @brief Tableau contenant les 16 paquets du bloc.
-    byte bundles[16];
+    byte bundles[BLOCK_SIZE];
 } Block;
 
 /// @brief Structure contenant les informations nécessaires au chiffrement pour chiffrer ou déchiffrer un bloc.
