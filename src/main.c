@@ -13,46 +13,11 @@
 int main(int argc, char ** argv)
 {
     //1615231972
-    printf("%ld\n", time(NULL));
-    srand(time(NULL));
-    int nbBits = 8;
-    DiffTable * diffTable = newDiffTable(nbBits);
-    int size = diffTable->nbElts;
+    //printf("%ld\n", time(NULL));
+    //srand(time(NULL));
 
-    int * sBox = malloc(size * sizeof(int));
-    randomSBox(sBox, diffTable->nbBits);
-
-    int * bestSBox = malloc(size * sizeof(int));
-        
-    initDiffTable(diffTable, sBox);
-    int max = diffTable->max;
-    int nbMax = -1;
-
-    for (int i = 0; i < 1 << 10; ++i)
-    {
-        memcpy(bestSBox, sBox, size * sizeof(int));
-        littleShuffle(bestSBox, size, 0.42);
-
-        initDiffTable(diffTable, bestSBox);
-        int n = numberOfMax(bestSBox, size, diffTable->max);
-        if (max > diffTable->max || 
-           (max == diffTable->max && (nbMax == -1 || nbMax > n)))
-        {
-            max = diffTable->max;
-            nbMax = n;
-            memcpy(sBox, bestSBox, size * sizeof(int));
-        }
-    }
-    free(bestSBox);
-
-    initDiffTable(diffTable, sBox);
-    printf("Max in DiffTable: %d\n", diffTable->max);
-    printf("Number of max: %d\n", nbMax);
-
-    free(sBox);
-    freeDiffTable(diffTable);
     // panda cipher :D!
-    /*Block plaintext = 
+    Block plaintext = 
     { 
         .bundles = 
         {
@@ -81,13 +46,13 @@ int main(int argc, char ** argv)
     printf("Key\t\t");
     printBlock(&cipherKey);
 
-    CipherData cipherData = { 0 };
-    initCipher(&cipherData, &cipherKey);
-    encryptBlock(&cipherData, &plaintext);
+    FastCipherData cipherData = { 0 };
+    initFastCipher(&cipherData, &cipherKey);
+    fastEncryptBlock(&cipherData, &plaintext);
     printf("Crypted\t\t");
     printBlock(&plaintext);
     decryptBlock(&cipherData, &plaintext);
     printf("Decrypted\t");
-    printBlock(&plaintext);*/
+    printBlock(&plaintext);
     return EXIT_SUCCESS;
 }
