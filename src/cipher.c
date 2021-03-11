@@ -188,7 +188,7 @@ void encryptCBC(CipherData *data, Block *iv, Block *message, int nbBlocks)
 {
     Block_xor(&message[0], iv);
     encryptBlock(data, &message[0]);
-    for (byte i = 1; i < nbBlocks; ++i)
+    for (int i = 1; i < nbBlocks; ++i)
     {
         Block_xor(&message[i], &message[i - 1]);
         encryptBlock(data, &message[i]);

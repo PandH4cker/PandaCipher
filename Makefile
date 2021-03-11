@@ -1,8 +1,8 @@
 CC = gcc
-CC_FLAGS = -Wall -O3
+CC_FLAGS = -Wall -lm
 exe = pandaCipher
 
-all: run
+all: compile
 
 run: compile
 	./$(exe)

@@ -1,11 +1,11 @@
 ﻿
 #include "../includes/cipher.h"
 #include "../includes/bonus.h"
+#include "../includes/utils.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <time.h>
+//#include <argp.h>
 
 //-------------------------------------------------------------------------------------------------
 //  Chiffrement et déchiffrement
@@ -17,7 +17,7 @@ int main(int argc, char ** argv)
     //srand(time(NULL));
 
     // panda cipher :D!
-    Block plaintext = 
+    /*Block plaintext = 
     { 
         .bundles = 
         {
@@ -29,7 +29,7 @@ int main(int argc, char ** argv)
     };
 
     printf("Plain\t\t");
-    printBlock(&plaintext);
+    printBlock(&plaintext);*/
 
     // 0x0123456789ABCDEF
     Block cipherKey = 
@@ -43,16 +43,21 @@ int main(int argc, char ** argv)
         }
     };
 
-    printf("Key\t\t");
-    printBlock(&cipherKey);
+    Block iv =
+    {
+        .bundles =
+        {
+            0xFF, 0xEE, 0xDD, 0xCC,
+            0xBB, 0xAA, 0x99, 0x88,
+            0x77, 0x66, 0x55, 0x44,
+            0x33, 0x22, 0x11, 0x00
+        }
+    };
 
-    FastCipherData cipherData = { 0 };
-    initFastCipher(&cipherData, &cipherKey);
-    fastEncryptBlock(&cipherData, &plaintext);
-    printf("Crypted\t\t");
-    printBlock(&plaintext);
-    decryptBlock(&cipherData, &plaintext);
-    printf("Decrypted\t");
-    printBlock(&plaintext);
+    CipherData cipherData = { 0 };
+    initCipher(&cipherData, &cipherKey);
+
+    encryptFile(&cipherData, &iv, argv[1]);
+    decryptFile(&cipherData, &iv, argv[2]);
     return EXIT_SUCCESS;
 }
