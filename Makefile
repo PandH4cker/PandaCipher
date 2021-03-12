@@ -2,10 +2,10 @@ CC = gcc
 CC_FLAGS = -Wall -lm
 exe = pandaCipher
 
-all: compile
+all: run
 
 run: compile
-	./$(exe)
+	./$(exe) --help
 
 compile:
 	$(CC) $(CC_FLAGS) src/*.c -o $(exe)
