@@ -71,6 +71,18 @@ int invPerm[128] = {
     7,   15,  23,  31,  39,  47,  55,  63,  71,  79,  87,  95, 103, 111, 119, 127,
 };
 
+Block initVect = 
+{
+    .bundles = 
+    {
+        0x01, 0x18, 0xde, 0xad,
+        0xbe, 0xef, 0xba, 0xd0,
+        0xca, 0xb0, 0xac, 0xe0,
+        0xad, 0xb0, 0x20, 0x47
+    }
+};
+
+
 void Block_xor(Block *block, Block *value)
 {
     Block b = *block; 

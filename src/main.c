@@ -11,85 +11,13 @@
 #include <string.h>
 #include <math.h>
 
-
-Block iv = 
-{
-    .bundles = 
-    {
-        0x01, 0x18, 0xde, 0xad,
-        0xbe, 0xef, 0xba, 0xd0,
-        0xca, 0xb0, 0xac, 0xe0,
-        0xad, 0xb0, 0x20, 0x47
-    }
-};
-
 //-------------------------------------------------------------------------------------------------
 //  Chiffrement et déchiffrement
 
 int main(int argc, char ** argv)
 {
-    struct arguments arguments;
 
-    arguments.listModes = 0;
-    arguments.encrypt = "";
-    arguments.cipherKey = "";
-    arguments.inputFile = "";
-
-    argp_parse(&argp, argc, argv, 0, 0, &arguments);
-
-    if(arguments.listModes)
-    {
-        printf("CBC\tCipherBlockChaining");
-        return EXIT_SUCCESS;
-    }
-
-    //FILE MODE
-    if(!strcmp(arguments.encrypt, "") && strcmp(arguments.inputFile, ""))
-        if (strcmp(arguments.cipherKey, ""))
-        {
-            CipherData data = { 0 };
-            Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
-
-            printBlock(&cipherKey);
-            initCipher(&data, &cipherKey);
-
-            encryptFile(&data, &iv, arguments.inputFile);
-            return EXIT_SUCCESS;
-        }
-    
-    if(strcmp(arguments.encrypt, ""))
-        if (strcmp(arguments.cipherKey, ""))
-        {
-            CipherData data = { 0 };
-            Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
-
-            printBlock(&cipherKey);
-            initCipher(&data, &cipherKey);
-
-            size_t strSize = strlen(arguments.encrypt);
-            size_t blockNeeded = ceil(strSize / 16.0);
-            Block * message = malloc(blockNeeded * sizeof(Block));
-
-            size_t size;
-            char ** splitted = splitInParts(arguments.encrypt, BLOCK_SIZE, &size);
-
-            for (int i = 0; i < blockNeeded; ++i)
-                charToByte(splitted[i], message[i].bundles, strlen(splitted[i]));
-
-            encryptCBC(&data, &iv, message, blockNeeded);
-
-            for (int i = 0; i < blockNeeded; ++i)
-                for (int j = 0; j < BLOCK_SIZE; ++j)
-                    printf("%02X", message[i].bundles[j]);
-            printf("\n");
-
-            for (int i = 0; i < size; ++i)
-                free(splitted[i]);
-            free(splitted);
-            free(message);
-            return EXIT_SUCCESS;
-        }
-
+    return handleArgs(argc, argv);
 
     //1615231972
     //printf("%ld\n", time(NULL));
@@ -138,5 +66,4 @@ int main(int argc, char ** argv)
 
     encryptFile(&cipherData, &iv, argv[1]);
     decryptFile(&cipherData, &iv, argv[2]);*/
-    return EXIT_FAILURE;
 }

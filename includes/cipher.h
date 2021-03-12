@@ -111,6 +111,8 @@ void Block_invPermutation(Block *block);
 /// @param[in]     block le bloc à afficher.
 void printBlock(Block *block);
 
+extern Block initVect;
+
 #endif
 
 /// @}
