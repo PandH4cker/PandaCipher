@@ -16,9 +16,10 @@ const char args_doc[] =
 const struct argp_option options[] = 
 {
     {"list-modes", OPT_LIST_MODES, NULL, 0, "Print cryptographic modes that can be used"},
-    {"encrypt", 'e', "STR", OPTION_ARG_OPTIONAL, "Specify encrypt mode", 1},
-    {"cipher-key", 'k', "KEY", 0, "Key for crypting", 1},
-    {"input-file", 'i', "FILE", 0, "Input file to be encrypted"},
+    {"encrypt", 'e', "STR", OPTION_ARG_OPTIONAL, "Specify encrypt mode"},
+    {"decrypt", 'd', "STR", OPTION_ARG_OPTIONAL, "Specify decrypt mode"},
+    {"cipher-key", 'k', "KEY", 0, "Key for crypting"},
+    {"input-file", 'i', "FILE", 0, "Input file to be encrypted/decrypted"},
     {0}
 };
 
@@ -34,6 +35,11 @@ error_t parse_opt(int key, char * arg, struct argp_state * state)
         case 'e':
             if (arg)
                 arguments->encrypt = arg;
+            break;
+        
+        case 'd':
+            if (arg)
+                arguments->decrypt = arg;
             break;
         
         case 'k':
@@ -65,9 +71,10 @@ void initArgumentsStructure(struct arguments * arguments)
     arguments->encrypt = "";
     arguments->cipherKey = "";
     arguments->inputFile = "";
+    arguments->decrypt = "";
 }
 
-void listCryptographicModes()
+void listCryptographicModes(void)
 {
     printf(
         "CBC\tCipherBlockChaining\n"
@@ -88,22 +95,28 @@ int handleArgs(int argc, char ** argv)
     }
 
     //FILE MODE
-    if(!strcmp(arguments.encrypt, "") && strcmp(arguments.inputFile, ""))
+    if (strcmp(arguments.inputFile, ""))
     {
-        if (strcmp(arguments.cipherKey, ""))
+        if(!strcmp(arguments.encrypt, ""))
         {
-            CipherData data = { 0 };
-            Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
-            initCipher(&data, &cipherKey);
-            encryptFile(&data, &initVect, arguments.inputFile);
-            return EXIT_SUCCESS;
+            if (strcmp(arguments.cipherKey, ""))
+            {
+                CipherData data = { 0 };
+                Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
+                initCipher(&data, &cipherKey);
+                encryptFile(&data, &initVect, arguments.inputFile);
+                return EXIT_SUCCESS;
+            }
+            else
+            {
+                fprintf(stderr, "You must specify the cipherkey\n");
+                return EXIT_FAILURE;
+            }
         }
-        else
-        {
-            fprintf(stderr, "You must specify the cipherkey\n");
-            return EXIT_FAILURE;
-        }
-    }    
+
+        else if (!strcmp(arguments.decrypt, ""))
+    }
+
     if(strcmp(arguments.encrypt, ""))
     {
         if (strcmp(arguments.cipherKey, ""))

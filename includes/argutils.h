@@ -15,12 +15,13 @@ extern struct argp argp;
 
 struct arguments
 {
-    char * args;
-    char ** strings;
     int listModes;
+    char * args;
     char * encrypt;
+    char * decrypt;
     char * cipherKey;
     char * inputFile;
+    char ** strings;
 };
 
 error_t parse_opt(int key, char * arg, struct argp_state * state);
