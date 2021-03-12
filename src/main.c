@@ -4,6 +4,7 @@
 #include "../includes/utils.h"
 #include "../includes/stringUtils.h"
 #include "../includes/argutils.h"
+#include "../includes/sha3.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -47,9 +48,8 @@ int main(int argc, char ** argv)
         if (strcmp(arguments.cipherKey, ""))
         {
             CipherData data = { 0 };
-            Block cipherKey = { 0 };
+            Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
 
-            charToByte(arguments.cipherKey, cipherKey.bundles, strlen(arguments.cipherKey));
             printBlock(&cipherKey);
             initCipher(&data, &cipherKey);
 
@@ -61,9 +61,9 @@ int main(int argc, char ** argv)
         if (strcmp(arguments.cipherKey, ""))
         {
             CipherData data = { 0 };
-            Block cipherKey = { 0 };
+            Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
 
-            charToByte(arguments.cipherKey, cipherKey.bundles, strlen(arguments.cipherKey));
+            printBlock(&cipherKey);
             initCipher(&data, &cipherKey);
 
             size_t strSize = strlen(arguments.encrypt);

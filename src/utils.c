@@ -1,5 +1,6 @@
 #include "../includes/utils.h"
 #include "../includes/stringUtils.h"
+#include "../includes/sha3.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,4 +75,21 @@ void decryptFile(CipherData * data, Block * iv, const char * path)
 
     free(concatenedString);
     free(message);
+}
+
+Block sha3CipherKeyBlock(char * cipherKey)
+{
+    Block blk = { 0 };
+
+    sha3_context c;
+    const byte * hash;
+
+    sha3_Init256(&c);
+    sha3_SetFlags(&c, SHA3_FLAGS_KECCAK);
+    sha3_Update(&c, cipherKey, strlen(cipherKey));
+    hash = sha3_Finalize(&c);
+
+    for (int i = 0; i < BLOCK_SIZE; ++i) blk.bundles[i] = hash[i];
+
+    return blk;
 }
