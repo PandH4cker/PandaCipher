@@ -16,8 +16,8 @@ const char args_doc[] =
 const struct argp_option options[] = 
 {
     {"list-modes", OPT_LIST_MODES, NULL, 0, "Print cryptographic modes that can be used"},
-    {"encrypt", 'e', "STR", OPTION_ARG_OPTIONAL, "Specify encrypt mode"},
-    {"cipher-key", 'k', "KEY", 0, "Key for crypting"},
+    {"encrypt", 'e', "STR", OPTION_ARG_OPTIONAL, "Specify encrypt mode", 1},
+    {"cipher-key", 'k', "KEY", 0, "Key for crypting", 1},
     {"input-file", 'i', "FILE", 0, "Input file to be encrypted"},
     {0}
 };
@@ -67,6 +67,13 @@ void initArgumentsStructure(struct arguments * arguments)
     arguments->inputFile = "";
 }
 
+void listCryptographicModes()
+{
+    printf(
+        "CBC\tCipherBlockChaining\n"
+    );
+}
+
 int handleArgs(int argc, char ** argv)
 {
     struct arguments arguments;
@@ -74,58 +81,45 @@ int handleArgs(int argc, char ** argv)
 
     argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
-        if(arguments.listModes)
+    if(arguments.listModes)
     {
-        printf("CBC\tCipherBlockChaining");
+        listCryptographicModes();
         return EXIT_SUCCESS;
     }
 
     //FILE MODE
     if(!strcmp(arguments.encrypt, "") && strcmp(arguments.inputFile, ""))
+    {
         if (strcmp(arguments.cipherKey, ""))
         {
             CipherData data = { 0 };
             Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
-
-            printBlock(&cipherKey);
             initCipher(&data, &cipherKey);
-
             encryptFile(&data, &initVect, arguments.inputFile);
             return EXIT_SUCCESS;
         }
-    
+        else
+        {
+            fprintf(stderr, "You must specify the cipherkey\n");
+            return EXIT_FAILURE;
+        }
+    }    
     if(strcmp(arguments.encrypt, ""))
+    {
         if (strcmp(arguments.cipherKey, ""))
         {
             CipherData data = { 0 };
             Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
-
-            printBlock(&cipherKey);
             initCipher(&data, &cipherKey);
-
-            size_t strSize = strlen(arguments.encrypt);
-            size_t blockNeeded = ceil(strSize / 16.0);
-            Block * message = malloc(blockNeeded * sizeof(Block));
-
-            size_t size;
-            char ** splitted = splitInParts(arguments.encrypt, BLOCK_SIZE, &size);
-
-            for (int i = 0; i < blockNeeded; ++i)
-                charToByte(splitted[i], message[i].bundles, strlen(splitted[i]));
-
-            encryptCBC(&data, &initVect, message, blockNeeded);
-
-            for (int i = 0; i < blockNeeded; ++i)
-                for (int j = 0; j < BLOCK_SIZE; ++j)
-                    printf("%02X", message[i].bundles[j]);
-            printf("\n");
-
-            for (int i = 0; i < size; ++i)
-                free(splitted[i]);
-            free(splitted);
-            free(message);
+            encryptString(&data, &initVect, arguments.encrypt);
             return EXIT_SUCCESS;
         }
 
+        else
+        {
+            fprintf(stderr, "You must specify the cipherkey\n");
+            return EXIT_FAILURE;
+        }
+    }
     return EXIT_FAILURE;
 }

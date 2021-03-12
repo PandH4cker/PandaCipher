@@ -1,15 +1,4 @@
-﻿
-#include "../includes/cipher.h"
-#include "../includes/bonus.h"
-#include "../includes/utils.h"
-#include "../includes/stringUtils.h"
-#include "../includes/argutils.h"
-#include "../includes/sha3.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
+﻿#include "../includes/argutils.h"
 
 //-------------------------------------------------------------------------------------------------
 //  Chiffrement et déchiffrement

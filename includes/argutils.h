@@ -24,6 +24,7 @@ struct arguments
 };
 
 error_t parse_opt(int key, char * arg, struct argp_state * state);
+void listCryptographicModes(void);
 void initArgumentsStructure(struct arguments * arguments);
 int handleArgs(int argc, char ** argv);
 

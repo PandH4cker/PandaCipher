@@ -77,6 +77,36 @@ void decryptFile(CipherData * data, Block * iv, const char * path)
     free(message);
 }
 
+void printDigest(Block * message, size_t size)
+{
+    for (int i = 0; i < size; ++i)
+        for (int j = 0; j < BLOCK_SIZE; ++j)
+            printf("%02X", message[i].bundles[j]);
+    printf("\n");
+}
+
+void encryptString(CipherData * data, Block * iv, char * s)
+{
+    size_t strSize = strlen(s);
+    size_t blockNeeded = ceil(strSize / 16.0);
+    Block * message = malloc(blockNeeded * sizeof(Block));
+
+    size_t size;
+    char ** splitted = splitInParts(s, BLOCK_SIZE, &size);
+
+    for (int i = 0; i < blockNeeded; ++i)
+        charToByte(splitted[i], message[i].bundles, strlen(splitted[i]));
+
+    encryptCBC(data, iv, message, blockNeeded);
+
+    printDigest(message, blockNeeded);
+
+    for (int i = 0; i < size; ++i)
+        free(splitted[i]);
+    free(splitted);
+    free(message);
+}
+
 Block sha3CipherKeyBlock(char * cipherKey)
 {
     Block blk = { 0 };
