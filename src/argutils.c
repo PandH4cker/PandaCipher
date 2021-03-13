@@ -2,24 +2,30 @@
 #include "../includes/cipher.h"
 #include "../includes/utils.h"
 #include "../includes/stringUtils.h"
+#include "../includes/colors.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-const char * argp_program_version = "PandaCipher 1.0.0";
-const char doc[] = "PandaCipher Help Prompt";
-const char * argp_program_bug_address = "<dray@et.esiea.fr>|<samenaire@et.esiea.fr>";
-const char args_doc[] = 
-            "ARG1";
+const char * argp_program_version = COLOR_YELLOW "PandaCipher 1.0.0" COLOR_RESET;
+const char doc[] = 
+    COLOR_YELLOW
+        "PandaCipher - Symetrical encryption/decryption program"
+    COLOR_RESET;
+const char * argp_program_bug_address = 
+    COLOR_BLUE
+        "<dray@et.esiea.fr>|<samenaire@et.esiea.fr>"
+    COLOR_RESET;
+const char args_doc[] = COLOR_RED "...args" COLOR_RESET;
 const struct argp_option options[] = 
 {
-    {"list-modes", OPT_LIST_MODES, NULL, 0, "Print cryptographic modes that can be used"},
-    {"encrypt", 'e', "STR", OPTION_ARG_OPTIONAL, "Specify encrypt mode"},
-    {"decrypt", 'd', "STR", OPTION_ARG_OPTIONAL, "Specify decrypt mode"},
-    {"cipher-key", 'k', "KEY", 0, "Key for crypting"},
-    {"input-file", 'i', "FILE", 0, "Input file to be encrypted/decrypted"},
+    {"list-modes", OPT_LIST_MODES, NULL, 0, COLOR_MAGENTA "Print cryptographic modes that can be used" COLOR_RESET},
+    {"encrypt", 'e', COLOR_CYAN "STR" COLOR_RESET, OPTION_ARG_OPTIONAL, COLOR_MAGENTA "Specify encrypt mode" COLOR_RESET},
+    {"decrypt", 'd', COLOR_CYAN "DIGEST" COLOR_RESET, OPTION_ARG_OPTIONAL, COLOR_MAGENTA "Specify decrypt mode" COLOR_RESET},
+    {"cipher-key", 'k', COLOR_CYAN "KEY", 0, COLOR_MAGENTA "Key for crypting" COLOR_RESET},
+    {"input-file", 'i', COLOR_CYAN "FILE", 0, COLOR_MAGENTA "Input file to be encrypted/decrypted" COLOR_RESET},
     {0}
 };
 
@@ -117,7 +123,7 @@ int handleArgs(int argc, char ** argv)
             }
             else
             {
-                fprintf(stderr, "You must specify the cipherkey\n");
+                fprintf(stderr, "[" COLOR_RED "!" "] You must specify the cipherkey\n");
                 return EXIT_FAILURE;
             }
         }
@@ -134,14 +140,14 @@ int handleArgs(int argc, char ** argv)
             }
             else
             {
-                fprintf(stderr, "You must specify the cipherkey\n");
+                fprintf(stderr, "[" COLOR_RED "!" "] You must specify the cipherkey\n");
                 return EXIT_FAILURE;
             }
         }
 
         else
         {
-            fprintf(stderr, "You must specify the task: encrypt/decrypt\n");
+            fprintf(stderr, "[" COLOR_RED "!" "] You must specify the task: encrypt/decrypt\n");
             return EXIT_FAILURE;
         }
     }
@@ -159,7 +165,7 @@ int handleArgs(int argc, char ** argv)
 
         else
         {
-            fprintf(stderr, "You must specify the cipherkey\n");
+            fprintf(stderr, "[" COLOR_RED "!" "] You must specify the cipherkey\n");
             return EXIT_FAILURE;
         }
     }
@@ -177,7 +183,7 @@ int handleArgs(int argc, char ** argv)
 
         else
         {
-            fprintf(stderr, "You must specify the cipherkey\n");
+            fprintf(stderr, "[" COLOR_RED "!" "] You must specify the cipherkey\n");
             return EXIT_FAILURE;
         }
     }
