@@ -11,6 +11,43 @@ void charToByte(char * chars, byte * bytes, unsigned int count)
         bytes[i] = (byte)chars[i];
 }
 
+byte * hexStringToByteArray(char * s)
+{
+    if(s == NULL) 
+       return NULL;
+
+    size_t slength = strlen(s);
+    if((slength % 2) != 0) // must be even
+       return NULL;
+
+    size_t dlength = slength / 2;
+
+    byte * data = malloc(dlength);
+    memset(data, 0, dlength);
+
+    size_t index = 0;
+    while (index < slength) {
+        char c = s[index];
+        int value = 0;
+        if(c >= '0' && c <= '9')
+          value = (c - '0');
+        else if (c >= 'A' && c <= 'F') 
+          value = (10 + (c - 'A'));
+        else if (c >= 'a' && c <= 'f')
+          value = (10 + (c - 'a'));
+        else {
+          free(data);
+          return NULL;
+        }
+
+        data[(index/2)] += value << (((index + 1) % 2) * 4);
+
+        index++;
+    }
+
+    return data;
+}
+
 char * __splitInParts(const char *str, size_t size)
 {
     static const char *p=NULL;

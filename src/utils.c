@@ -98,13 +98,30 @@ void encryptString(CipherData * data, Block * iv, char * s)
         charToByte(splitted[i], message[i].bundles, strlen(splitted[i]));
 
     encryptCBC(data, iv, message, blockNeeded);
-
     printDigest(message, blockNeeded);
 
     for (int i = 0; i < size; ++i)
         free(splitted[i]);
     free(splitted);
     free(message);
+}
+
+void decryptString(CipherData * data, Block * iv, char * s)
+{
+    byte * byteArray = hexStringToByteArray(s);
+    size_t arraySize = strlen(s) / 2;
+    size_t blockNeeded = ceil(arraySize / 16.0);
+    Block * message = malloc(blockNeeded * sizeof(Block));
+        
+    for (int i = 0; i < blockNeeded; ++i)
+        for (int j = 0; j < BLOCK_SIZE; ++j)
+            message[i].bundles[j] = byteArray[j + BLOCK_SIZE * i];
+
+    decryptCBC(data, iv, message, blockNeeded);
+    printDigest(message, blockNeeded);
+
+    free(message);
+    free(byteArray);
 }
 
 Block sha3CipherKeyBlock(char * cipherKey)

@@ -33,20 +33,24 @@ error_t parse_opt(int key, char * arg, struct argp_state * state)
             break;
         
         case 'e':
+            arguments->encryptFlag = 1;
             if (arg)
                 arguments->encrypt = arg;
             break;
         
         case 'd':
+            arguments->decryptFlag = 1;
             if (arg)
                 arguments->decrypt = arg;
             break;
         
         case 'k':
+            arguments->cipherKeyFlag = 1;
             arguments->cipherKey = arg;
             break;
         
         case 'i':
+            arguments->inputFileFlag = 1;
             arguments->inputFile = arg;
             break;
 
@@ -68,6 +72,10 @@ struct argp argp = {options, parse_opt, args_doc, doc};
 void initArgumentsStructure(struct arguments * arguments)
 {
     arguments->listModes = 0;
+    arguments->encryptFlag = 0;
+    arguments->decryptFlag = 0;
+    arguments->cipherKeyFlag = 0;
+    arguments->inputFileFlag = 0;
     arguments->encrypt = "";
     arguments->cipherKey = "";
     arguments->inputFile = "";
@@ -95,11 +103,11 @@ int handleArgs(int argc, char ** argv)
     }
 
     //FILE MODE
-    if (strcmp(arguments.inputFile, ""))
+    if (strcmp(arguments.inputFile, "") && arguments.inputFileFlag)
     {
-        if(!strcmp(arguments.encrypt, ""))
+        if(!strcmp(arguments.encrypt, "") && arguments.encryptFlag)
         {
-            if (strcmp(arguments.cipherKey, ""))
+            if (strcmp(arguments.cipherKey, "") && arguments.cipherKeyFlag)
             {
                 CipherData data = { 0 };
                 Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
@@ -114,12 +122,33 @@ int handleArgs(int argc, char ** argv)
             }
         }
 
-        else if (!strcmp(arguments.decrypt, ""))
+        else if (!strcmp(arguments.decrypt, "") && arguments.decryptFlag)
+        {
+            if (strcmp(arguments.cipherKey, "") && arguments.cipherKeyFlag)
+            {
+                CipherData data = { 0 };
+                Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
+                initCipher(&data, &cipherKey);
+                decryptFile(&data, &initVect, arguments.inputFile);
+                return EXIT_SUCCESS;
+            }
+            else
+            {
+                fprintf(stderr, "You must specify the cipherkey\n");
+                return EXIT_FAILURE;
+            }
+        }
+
+        else
+        {
+            fprintf(stderr, "You must specify the task: encrypt/decrypt\n");
+            return EXIT_FAILURE;
+        }
     }
 
-    if(strcmp(arguments.encrypt, ""))
+    if(strcmp(arguments.encrypt, "") && arguments.encryptFlag)
     {
-        if (strcmp(arguments.cipherKey, ""))
+        if (strcmp(arguments.cipherKey, "") && arguments.cipherKeyFlag)
         {
             CipherData data = { 0 };
             Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
@@ -134,5 +163,24 @@ int handleArgs(int argc, char ** argv)
             return EXIT_FAILURE;
         }
     }
+
+    if(strcmp(arguments.decrypt, "") && arguments.decryptFlag)
+    {
+        if (strcmp(arguments.cipherKey, "") && arguments.cipherKeyFlag)
+        {
+            CipherData data = { 0 };
+            Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
+            initCipher(&data, &cipherKey);
+            decryptString(&data, &initVect, arguments.decrypt);
+            return EXIT_SUCCESS;
+        }
+
+        else
+        {
+            fprintf(stderr, "You must specify the cipherkey\n");
+            return EXIT_FAILURE;
+        }
+    }
+
     return EXIT_FAILURE;
 }
