@@ -53,7 +53,7 @@ void initDiffTable(DiffTable *diffTable, int *sBox);
 /// @param[out] sBox   la S-box générée.
 ///                    Le tableau doit impérativement avoir (au moins) 2^nbBits cases. 
 /// @param[in]  nbBits le nombre de bits de la S-box.
-void randomSBox(int *sBox, int nbBits);
+void randomSBox(int * sBox, int nbBits);
 
 //-------------------------------------------------------------------------------------------------
 //  Fonction de chiffrement optimisée
@@ -80,6 +80,13 @@ void initFastCipher(FastCipherData *data, Block *cipherKey);
 ///                      Cette structure doit être initialisée avec la fonction initCipher().
 /// @param[in,out] block le bloc à chiffrer.
 void fastEncryptBlock(FastCipherData *data, Block *block);
+
+void swap(int * a, int * b);
+void shuffle(int * sBox, unsigned int size);
+void littleShuffle(int * sBox, unsigned int size, float percent);
+int numberOfMax(int * sBox, unsigned int size, unsigned int max);
+int * getBestSBox(int nbBits);
+
 
 #endif // !_BONUS_H_
 
