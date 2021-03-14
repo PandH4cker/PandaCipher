@@ -16,7 +16,7 @@ extern struct argp argp;
 struct arguments
 {
     int listModes, encryptFlag, decryptFlag, 
-        cipherKeyFlag, inputFileFlag;
+        cipherKeyFlag, inputFileFlag, mode;
     char * args;
     char * encrypt;
     char * decrypt;

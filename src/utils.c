@@ -1,6 +1,7 @@
 #include "../includes/utils.h"
 #include "../includes/stringUtils.h"
 #include "../includes/sha3.h"
+#include "../includes/colors.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,7 +46,7 @@ void blocktoFile(Block * message, size_t size, const char * path)
     fclose(f);
 }
 
-void encryptFile(CipherData * data, Block * iv, const char * path)
+void encryptFile(CipherData * data, Block * iv, const char * path, const int mode)
 {
     size_t fileSize = getFileSize(path);
     size_t blockNeeded = ceil(fileSize / 16.0);
@@ -53,7 +54,17 @@ void encryptFile(CipherData * data, Block * iv, const char * path)
     Block * message = malloc(blockNeeded * sizeof(Block));
     fileToBlock(message, blockNeeded, path);
 
-    encryptCBC(data, iv, message, blockNeeded);
+    switch (mode)
+    {
+        case CBC_MODE:
+            encryptCBC(data, iv, message, blockNeeded);
+            break;
+        
+        default:
+            fprintf(stderr, "[" COLOR_RED "!" COLOR_RESET "] The specified mode is unknown. List available modes by using --list-modes command\n");
+            exit(EXIT_FAILURE);
+    }
+
     char * concatenedString = concat(path, ".crypt");
     blocktoFile(message, blockNeeded, concatenedString);
 
@@ -61,7 +72,7 @@ void encryptFile(CipherData * data, Block * iv, const char * path)
     free(message);
 }
 
-void decryptFile(CipherData * data, Block * iv, const char * path)
+void decryptFile(CipherData * data, Block * iv, const char * path, const int mode)
 {
     size_t fileSize = getFileSize(path);
     size_t blockNeeded = ceil(fileSize / 16.0);
@@ -69,7 +80,17 @@ void decryptFile(CipherData * data, Block * iv, const char * path)
     Block * message = malloc(blockNeeded * sizeof(Block));
     fileToBlock(message, blockNeeded, path);
 
-    decryptCBC(data, iv, message, blockNeeded);
+    switch (mode)
+    {
+        case CBC_MODE:
+            decryptCBC(data, iv, message, blockNeeded);
+            break;
+        
+        default:
+            fprintf(stderr, "[" COLOR_RED "!" COLOR_RESET "] The specified mode is unknown. List available modes by using --list-modes command\n");
+            exit(EXIT_FAILURE);
+    }
+
     char * concatenedString = concat(path, ".decrypted");
     blocktoFile(message, blockNeeded, concatenedString);
 
@@ -85,7 +106,7 @@ void printDigest(Block * message, size_t size)
     printf("\n");
 }
 
-void encryptString(CipherData * data, Block * iv, char * s)
+void encryptString(CipherData * data, Block * iv, char * s, const int mode)
 {
     size_t strSize = strlen(s);
     size_t blockNeeded = ceil(strSize / 16.0);
@@ -96,8 +117,18 @@ void encryptString(CipherData * data, Block * iv, char * s)
 
     for (int i = 0; i < blockNeeded; ++i)
         charToByte(splitted[i], message[i].bundles, strlen(splitted[i]));
+    
+    switch (mode)
+    {
+        case CBC_MODE:
+            encryptCBC(data, iv, message, blockNeeded);
+            break;
+        
+        default:
+            fprintf(stderr, "[" COLOR_RED "!" COLOR_RESET "] The specified mode is unknown. List available modes by using --list-modes command\n");
+            exit(EXIT_FAILURE);
+    }
 
-    encryptCBC(data, iv, message, blockNeeded);
     printDigest(message, blockNeeded);
 
     for (int i = 0; i < size; ++i)
@@ -106,7 +137,7 @@ void encryptString(CipherData * data, Block * iv, char * s)
     free(message);
 }
 
-void decryptString(CipherData * data, Block * iv, char * s)
+void decryptString(CipherData * data, Block * iv, char * s, const int mode)
 {
     byte * byteArray = hexStringToByteArray(s);
     size_t arraySize = strlen(s) / 2;
@@ -117,7 +148,17 @@ void decryptString(CipherData * data, Block * iv, char * s)
         for (int j = 0; j < BLOCK_SIZE; ++j)
             message[i].bundles[j] = byteArray[j + BLOCK_SIZE * i];
 
-    decryptCBC(data, iv, message, blockNeeded);
+    switch (mode)
+    {
+        case CBC_MODE:
+            decryptCBC(data, iv, message, blockNeeded);
+            break;
+        
+        default:
+            fprintf(stderr, "[" COLOR_RED "!" COLOR_RESET "] The specified mode is unknown. List available modes by using --list-modes command\n");
+            exit(EXIT_FAILURE);
+    }
+
     printDigest(message, blockNeeded);
 
     free(message);

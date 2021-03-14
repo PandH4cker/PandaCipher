@@ -12,7 +12,7 @@
 const char * argp_program_version = COLOR_YELLOW "PandaCipher 1.0.0" COLOR_RESET;
 const char doc[] = 
     COLOR_YELLOW
-        "PandaCipher - Symetrical encryption/decryption program"
+        "PandaCipher - Symetrical encryption/decryption program (https://github.com/MrrRaph/PandaCipher)"
     COLOR_RESET;
 const char * argp_program_bug_address = 
     COLOR_BLUE
@@ -26,6 +26,7 @@ const struct argp_option options[] =
     {"decrypt", 'd', COLOR_CYAN "DIGEST" COLOR_RESET, OPTION_ARG_OPTIONAL, COLOR_MAGENTA "Specify decrypt mode" COLOR_RESET},
     {"cipher-key", 'k', COLOR_CYAN "KEY", 0, COLOR_MAGENTA "Key for crypting" COLOR_RESET},
     {"input-file", 'i', COLOR_CYAN "FILE", 0, COLOR_MAGENTA "Input file to be encrypted/decrypted" COLOR_RESET},
+    {"encrypt-mode", 'm', COLOR_CYAN "MODE", 0, COLOR_MAGENTA "Mode to use/used in the encryption. Specify the number of the mode that you can see by using --list-modes command (Default: 0, CBC)" COLOR_RESET},
     {0}
 };
 
@@ -60,6 +61,9 @@ error_t parse_opt(int key, char * arg, struct argp_state * state)
             arguments->inputFile = arg;
             break;
 
+        case 'm':
+            arguments->mode = atoi(arg);
+            break;
         case ARGP_KEY_ARG:
             arguments->args = arg;
             arguments->strings = &state->argv[state->next];
@@ -78,6 +82,7 @@ struct argp argp = {options, parse_opt, args_doc, doc};
 void initArgumentsStructure(struct arguments * arguments)
 {
     arguments->listModes = 0;
+    arguments->mode = 0;
     arguments->encryptFlag = 0;
     arguments->decryptFlag = 0;
     arguments->cipherKeyFlag = 0;
@@ -91,7 +96,9 @@ void initArgumentsStructure(struct arguments * arguments)
 void listCryptographicModes(void)
 {
     printf(
-        "CBC\tCipherBlockChaining\n"
+        "╔═══════════════════════════════╗\n"
+        "║0\t" COLOR_GREEN "CBC(CipherBlockChaining)" COLOR_RESET "║\n"
+        "╚═══════════════════════════════╝\n"
     );
 }
 
@@ -118,12 +125,12 @@ int handleArgs(int argc, char ** argv)
                 CipherData data = { 0 };
                 Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
                 initCipher(&data, &cipherKey);
-                encryptFile(&data, &initVect, arguments.inputFile);
+                encryptFile(&data, &initVect, arguments.inputFile, arguments.mode);
                 return EXIT_SUCCESS;
             }
             else
             {
-                fprintf(stderr, "[" COLOR_RED "!" "] You must specify the cipherkey\n");
+                fprintf(stderr, "[" COLOR_RED "!" COLOR_RESET "] You must specify the cipherkey\n");
                 return EXIT_FAILURE;
             }
         }
@@ -135,19 +142,19 @@ int handleArgs(int argc, char ** argv)
                 CipherData data = { 0 };
                 Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
                 initCipher(&data, &cipherKey);
-                decryptFile(&data, &initVect, arguments.inputFile);
+                decryptFile(&data, &initVect, arguments.inputFile, arguments.mode);
                 return EXIT_SUCCESS;
             }
             else
             {
-                fprintf(stderr, "[" COLOR_RED "!" "] You must specify the cipherkey\n");
+                fprintf(stderr, "[" COLOR_RED "!" COLOR_RESET "] You must specify the cipherkey\n");
                 return EXIT_FAILURE;
             }
         }
 
         else
         {
-            fprintf(stderr, "[" COLOR_RED "!" "] You must specify the task: encrypt/decrypt\n");
+            fprintf(stderr, "[" COLOR_RED "!" COLOR_RESET "] You must specify the task: encrypt/decrypt\n");
             return EXIT_FAILURE;
         }
     }
@@ -159,13 +166,13 @@ int handleArgs(int argc, char ** argv)
             CipherData data = { 0 };
             Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
             initCipher(&data, &cipherKey);
-            encryptString(&data, &initVect, arguments.encrypt);
+            encryptString(&data, &initVect, arguments.encrypt, arguments.mode);
             return EXIT_SUCCESS;
         }
 
         else
         {
-            fprintf(stderr, "[" COLOR_RED "!" "] You must specify the cipherkey\n");
+            fprintf(stderr, "[" COLOR_RED "!" COLOR_RESET "] You must specify the cipherkey\n");
             return EXIT_FAILURE;
         }
     }
@@ -177,13 +184,13 @@ int handleArgs(int argc, char ** argv)
             CipherData data = { 0 };
             Block cipherKey = sha3CipherKeyBlock(arguments.cipherKey);
             initCipher(&data, &cipherKey);
-            decryptString(&data, &initVect, arguments.decrypt);
+            decryptString(&data, &initVect, arguments.decrypt, arguments.mode);
             return EXIT_SUCCESS;
         }
 
         else
         {
-            fprintf(stderr, "[" COLOR_RED "!" "] You must specify the cipherkey\n");
+            fprintf(stderr, "[" COLOR_RED "!" COLOR_RESET "] You must specify the cipherkey\n");
             return EXIT_FAILURE;
         }
     }
