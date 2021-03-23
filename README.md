@@ -88,3 +88,17 @@ for any corresponding short options.
 Report bugs to <dray@et.esiea.fr>|<samenaire@et.esiea.fr>.
 
 ```
+
+### Example:
+
+> You can encrypt/decrypt strings/files (with -i) on the command line.
+> When encrypt/decrypt the program return the hex digest in case of non printable string when decrypting. Then you could use for example xxd with "-r -p" to convert hex string to string and recover the message.
+
+```
+❯ ./pandaCipher -e"Les Panda c'est la vie" -k "Pandanimal"
+AA2D3C4CBC6D5E0C43ACC93AA22146DB47F54A9F9DE07175D3A2D92B8E898BE8
+❯ ./pandaCipher -d"AA2D3C4CBC6D5E0C43ACC93AA22146DB47F54A9F9DE07175D3A2D92B8E898BE8" -k "Pandanimal"
+4C65732050616E6461206327657374206C612076696500000000000000000000
+❯ ./pandaCipher -d"AA2D3C4CBC6D5E0C43ACC93AA22146DB47F54A9F9DE07175D3A2D92B8E898BE8" -k "Pandanimal" | xxd -r -p
+Les Panda c'est la vie%                                                       
+```
