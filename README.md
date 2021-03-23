@@ -13,6 +13,47 @@
 > The avaible encryption modes are as follow:
 > + CBC
 
+> In bonus.h, a function named getBestSBox(...) is defined but not used in the whole program. This function allow you to search in 2<sup>10</sup> tries 
+```C
+int * getBestSBox(int nbBits)
+{
+    DiffTable * diffTable = newDiffTable(nbBits);
+    int size = diffTable->nbElts;
+
+    int * sBox = malloc(size * sizeof(int));
+    randomSBox(sBox, diffTable->nbBits);
+
+    int * bestSBox = malloc(size * sizeof(int));
+        
+    initDiffTable(diffTable, sBox);
+    int max = diffTable->max;
+    int nbMax = -1;
+
+    for (int i = 0; i < 1 << 10; ++i)
+    {
+        memcpy(bestSBox, sBox, size * sizeof(int));
+        littleShuffle(bestSBox, size, 0.50);
+
+        initDiffTable(diffTable, bestSBox);
+        int n = numberOfMax(bestSBox, size, diffTable->max);
+        if (max > diffTable->max || 
+           (max == diffTable->max && (nbMax == -1 || nbMax > n)))
+        {
+            max = diffTable->max;
+            nbMax = n;
+            memcpy(sBox, bestSBox, size * sizeof(int));
+        }
+    }
+    free(bestSBox);
+
+    initDiffTable(diffTable, sBox);
+    printf("Max in DiffTable: %d\n", diffTable->max);
+    printf("Number of max: %d\n", nbMax);
+    return sBox;
+}
+
+```
+
 > It's written in __C programming language including some libraries like so:__
 > + [SHA3 - Keccak](https://github.com/brainhub/SHA3IUF)
 > + [Argp](https://github.com/coreutils/gnulib/blob/master/lib/argp.h)
